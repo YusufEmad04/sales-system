@@ -47,16 +47,21 @@ class DynamoDBSales:
             self,
             employee_id,
             customer_name,
-            customer_number
+            customer_number,
+            category,
+            random_number
     ):
-        sale_id = str(hash(str(employee_id) + customer_name + customer_number))
         employee_sale_num = DynamoDBCounter('counter').increment_employee_counter(str(employee_id))
+        sale_id = str(hash(str(employee_id) + customer_name + customer_number + category + str(employee_sale_num) + str(random_number)))
+
         self.table.put_item(
             Item={
                 'sale_id': sale_id,
                 'employee_id': employee_id,
                 'customer_name': customer_name,
                 'customer_number': customer_number,
+                'category': category,
+                'random_number': random_number,
                 'employee_sale_num': employee_sale_num
             }
         )
@@ -76,18 +81,25 @@ class DynamoDBSales:
 def lambda_handler(event, context):
     # get employee_id, customer_name, customer_number from event
 
-    body = json.loads(event["body"])
+    print(event)
+
+    body = json.loads(event['body'])
+    # body = event
 
     employee_id = body['employee_id']
     customer_name = body['customer_name']
     customer_number = body['customer_number']
+    category = body['category']
+    random_number = body['random_number']
 
     db = DynamoDBSales('sales')
     # add sale
     sale_id = db.add_sale(
         employee_id=int(employee_id),
         customer_name=customer_name,
-        customer_number=customer_number
+        customer_number=customer_number,
+        category=category,
+        random_number=random_number
     )
 
     return {

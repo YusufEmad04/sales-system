@@ -12,12 +12,12 @@ def get_excel_url(db):
     """
     # create dataframe and order columns
     df = pd.DataFrame(items)
-    df = df[['employee_id', 'customer_name', 'customer_number', 'employee_sale_num']]
+    df = df[['employee_id', 'customer_name', 'customer_number', 'category', 'random_number', 'employee_sale_num']]
     # order by employee_id
     df = df.sort_values(by=['employee_id'])
     # order each employee's sales by employee_sale_num
     df = df.groupby('employee_id', group_keys=True).apply(lambda x: x.sort_values('employee_sale_num'))
-    print(df)
+    # print(df)
     # save to excel file
     df.to_excel('/tmp/sales.xlsx', index=True)
     # upload to s3
